@@ -1,3 +1,3 @@
-#Modular Monolith Factory
+# Modular Monolith Factory
 
 Forge for creating blank modular monolith projects
