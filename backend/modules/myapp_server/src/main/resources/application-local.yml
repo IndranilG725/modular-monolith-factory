@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: myapp
+
+  config:
+    import: "optional:file:.env.local[.properties]"  
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/myappdb?createDatabaseIfNotExist=true
+    username: ${MYSQL_ROOT_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
+  # Optional: Hibernate settings to auto-create/update tables
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true  # turn off for production
+
+#   data:
+#     mongodb:
+#       host: localhost
+#       port: 27017
+#       database: mydb
+#       username: ${MONGO_USERNAME}
+#       password: ${MONGO_PASSWORD}
+#     redis:
+#       password: ${REDIS_PASSWORD}
+#       host: localhost
+#       port: 6379
+    
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081
+
+jwt:
+  # Industry standard for Access Token: 15 to 60 minutes
+  access-token-expiration-minutes: 15
+  cookie:
+    secure: false # Turn for HTTPS
+
+  # Industry standard for Refresh Token: 7 to 30 days
+  refresh-token-expiration-days: 7
+  
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
+
+#   cache:
+#     type: redis
+#     redis:
+#       time-to-live: 600000 # Automatically evicts/deletes cache after 10 minutes (in milliseconds)
+
+server:
+  port: 8081
+
+# eureka:
+#   client:
+#     register-with-eureka: true
+#     fetch-registry: true
+#     service-url:
+#       defaultZone: http://localhost:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          "*"
+  endpoint:
+    health:
+      show-details:
+        always
