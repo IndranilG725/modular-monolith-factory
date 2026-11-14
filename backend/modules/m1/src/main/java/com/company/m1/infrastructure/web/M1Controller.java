@@ -2,10 +2,12 @@ package com.company.m1.infrastructure.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.company.m1.application.M1Service;
 import com.company.m1.application.dto.response.M1DTO;
@@ -22,5 +24,11 @@ public class M1Controller {
     @GetMapping("/{id}")
     ResponseEntity<M1DTO> m1Fn(@PathVariable Long id) {
         return new ResponseEntity<>(m1Service.getM1(id), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    ResponseEntity<Boolean> deleteById(@PathVariable Long id) {
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }

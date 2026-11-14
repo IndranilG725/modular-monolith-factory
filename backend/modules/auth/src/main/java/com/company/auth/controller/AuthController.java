@@ -117,7 +117,7 @@ public class AuthController {
                     .body(new LoginResponseDTO(newAccessToken));
         } catch (IllegalArgumentException ex) {
             // Invalid or expired refresh token
-            ResponseCookie clearCookie = createClearRefreshTokenCookie();
+            ResponseCookie clearCookie = clearRefreshTokenCookie();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
                     .build();
@@ -129,7 +129,7 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        ResponseCookie clearCookie = createClearRefreshTokenCookie();
+        ResponseCookie clearCookie = clearRefreshTokenCookie();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
@@ -146,7 +146,7 @@ public class AuthController {
                 .build();
     }
 
-    private ResponseCookie createClearRefreshTokenCookie() {
+    private ResponseCookie clearRefreshTokenCookie() {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(cookieSecure)

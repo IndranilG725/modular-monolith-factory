@@ -17,6 +17,27 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <!-- Bucket4j Core -->
+    <dependency>
+        <groupId>com.bucket4j</groupId>
+        <artifactId>bucket4j_jdk17-core</artifactId>
+    </dependency>
+
+    <!-- Bucket4j Redis / Lettuce Integration -->
+    <dependency>
+        <groupId>com.bucket4j</groupId>
+        <artifactId>bucket4j_jdk17-redis-common</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.bucket4j</groupId>
+        <artifactId>bucket4j_jdk17-lettuce</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

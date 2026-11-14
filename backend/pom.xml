@@ -42,8 +42,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-
         <!--
             <dependency>
                 <groupId>com.mysql</groupId>
@@ -73,6 +71,24 @@
             </dependency>
         -->
 
+        <!-- Bucket4j Core -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
+            <version>8.14.0</version>
+        </dependency>
+
+        <!-- Bucket4j Redis / Lettuce Integration -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-redis-common</artifactId>
+            <version>8.14.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-lettuce</artifactId>
+            <version>8.14.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
