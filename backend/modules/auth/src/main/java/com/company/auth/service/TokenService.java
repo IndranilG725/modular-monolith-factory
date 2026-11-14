@@ -37,11 +37,12 @@ public class TokenService {
         Instant expiration = now.plus(accessTokenExpirationMinutes, ChronoUnit.MINUTES);
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("my-company-app")
-                .issuedAt(now)
-                .expiresAt(expiration)
-                .subject(username)
-                .claim("type", "ACCESS")
+                .issuer("my-company-app") // iss
+                .issuedAt(now) // iat
+                .expiresAt(expiration) // exp
+                .subject(username) // sub
+                .claim("type", "ACCESS") // type
+                .claim("role", "ROLE_USER") // role
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

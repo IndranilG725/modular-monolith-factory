@@ -21,12 +21,15 @@ public class UserRegistrationService {
     @Transactional
     public void registerNewUser(RegisterRequestDTO request) {
         // 1. Check if username or email already exists
-        if (userLoginRepository.existsByUsername(request.username())) {
-            throw new IllegalArgumentException("Username is already taken!");
-        }
-        if (userLoginRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email is already registered!");
-        }
+        userLoginRepository.findFirstByUsernameOrEmail(request.username(), request.email())
+                .ifPresent(existingUser -> {
+                    if (existingUser.getUsername().equalsIgnoreCase(request.username())) {
+                        throw new IllegalArgumentException("Username is already taken!");
+                    }
+                    if (existingUser.getEmail().equalsIgnoreCase(request.email())) {
+                        throw new IllegalArgumentException("Email is already registered!");
+                    }
+                });
 
         // 2. HASH THE PASSWORD! (Crucial Security Step)
         String hashedPassword = passwordEncoder.encode(request.password());
