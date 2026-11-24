@@ -65,6 +65,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     })
   }, [])
 
+  const loginWithGoogle = useCallback(async (idToken: string) => {
+    const response = await authApi.loginWithGoogle(idToken)
+    tokenStorage.setAccessToken(response.accessToken)
+
+    const extractedUser = extractUserFromToken(response.accessToken)
+    setAuthState({
+      user: extractedUser,
+      accessToken: response.accessToken,
+    })
+  }, [])
+
   const register = useCallback(async (data: RegisterRequest) => {
     const response = await authApi.register(data)
     tokenStorage.setAccessToken(response.accessToken)
@@ -99,6 +110,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       !isTokenExpired(authState.accessToken),
     isLoading,
     login,
+    loginWithGoogle,
     register,
     logout,
   }

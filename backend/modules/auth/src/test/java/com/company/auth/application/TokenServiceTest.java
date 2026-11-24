@@ -1,4 +1,4 @@
-package com.company.auth.service;
+package com.company.auth.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -142,7 +142,8 @@ class TokenServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = { "   ", "\t", "\n" })
     @DisplayName("Should throw IllegalArgumentException when refresh token is null, empty, or whitespace")
-    void validateRefreshTokenAndGetUsername_WhenTokenIsNullOrEmpty_ShouldThrowIllegalArgumentException(String invalidToken) {
+    void validateRefreshTokenAndGetUsername_WhenTokenIsNullOrEmpty_ShouldThrowIllegalArgumentException(
+            String invalidToken) {
         assertThatThrownBy(() -> tokenService.validateRefreshTokenAndGetUsername(invalidToken))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Refresh token is missing or empty.");

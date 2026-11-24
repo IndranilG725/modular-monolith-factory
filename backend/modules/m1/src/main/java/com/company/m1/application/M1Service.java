@@ -32,7 +32,7 @@ public class M1Service {
         m1DomainService.myFunc(m1);
     }
 
-    public M1DTO getM1(Long id) {
+    public M1DTO getM1byId(Long id) {
         logger.info("Trying to fetch M1 by id: {}", id);
         return m1Mapper.toDTO(m1RepositoryPort.findById(id));
     }

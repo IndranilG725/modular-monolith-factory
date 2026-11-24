@@ -1,4 +1,4 @@
-package com.company.auth.service;
+package com.company.auth.application;
 
 import java.util.Collections;
 
@@ -8,23 +8,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.company.auth.repository.UserLoginRepository;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserLoginRepository userLoginRepository;
+    private final AuthRepositoryPort authRepositoryPort;
 
-    public CustomUserDetailsService(UserLoginRepository userLoginRepository) {
-        this.userLoginRepository = userLoginRepository;
+    public CustomUserDetailsService(AuthRepositoryPort authRepositoryPort) {
+        this.authRepositoryPort = authRepositoryPort;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userLoginRepository.findByUsername(username)
+        return authRepositoryPort.findByUsername(username)
                 .map(user -> new User(
                         user.getUsername(),
-                        user.getPassword(),
+                        user.getPasswordHash(),
                         Collections.emptyList()))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }

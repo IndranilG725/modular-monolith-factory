@@ -1,4 +1,4 @@
-package com.company.auth.entity;
+package com.company.auth.infrastructure.persistence;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -3,7 +3,11 @@ spring:
     name: myapp
 
   config:
-    import: "optional:file:.env.local[.properties]"  
+    import:
+      - "optional:file:.env.local[.properties]"
+      - "optional:file:backend/.env.local[.properties]"
+      - "optional:file:../.env.local[.properties]"
+      - "optional:file:../../.env.local[.properties]"  
 
   datasource:
     url: jdbc:mysql://localhost:3306/myappdb?createDatabaseIfNotExist=true
@@ -22,10 +26,11 @@ spring:
 #       database: mydb
 #       username: ${MONGO_USERNAME}
 #       password: ${MONGO_PASSWORD}
-#     redis:
-#       password: ${REDIS_PASSWORD}
-#       host: localhost
-#       port: 6379
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:8013472486}
     
   security:
     oauth2:

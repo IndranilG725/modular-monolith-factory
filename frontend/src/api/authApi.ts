@@ -18,6 +18,19 @@ export const authApi = {
   },
 
   /**
+   * Authenticates user via Google OAuth / OpenID Connect ID token.
+   * Sends Google ID token to /api/v1/auth/google.
+   * Returns short-lived access token in body and sets HttpOnly refresh cookie.
+   */
+  async loginWithGoogle(idToken: string): Promise<LoginResponse> {
+    return apiClient<LoginResponse>(`${API_BASE_URL}/auth/google`, {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+      requiresAuth: false,
+    })
+  },
+
+  /**
    * Registers a new user at backend /api/v1/auth/register.
    * Returns short-lived access token in body and sets HttpOnly refresh cookie.
    */

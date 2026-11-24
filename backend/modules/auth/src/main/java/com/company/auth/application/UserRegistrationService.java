@@ -1,27 +1,26 @@
-package com.company.auth.service;
+package com.company.auth.application;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.company.auth.dto.request.RegisterRequestDTO;
-import com.company.auth.entity.UserLoginEntity;
-import com.company.auth.repository.UserLoginRepository;
+import com.company.auth.application.dto.request.RegisterRequestDTO;
+import com.company.auth.domain.model.User;
 
 @Service
 public class UserRegistrationService {
-    private final UserLoginRepository userLoginRepository;
+    private final AuthRepositoryPort authRepositoryPort;
     private final PasswordEncoder passwordEncoder;
 
-    public UserRegistrationService(UserLoginRepository userLoginRepository, PasswordEncoder passwordEncoder) {
-        this.userLoginRepository = userLoginRepository;
+    public UserRegistrationService(AuthRepositoryPort authRepositoryPort, PasswordEncoder passwordEncoder) {
+        this.authRepositoryPort = authRepositoryPort;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
-    public void registerNewUser(RegisterRequestDTO request) {
-        // 1. Check if username or email already exists
-        userLoginRepository.findFirstByUsernameOrEmail(request.username(), request.email())
+    public User registerNewUser(RegisterRequestDTO request) {
+        // 1. Business rule: Uniqueness check
+        authRepositoryPort.findFirstByUsernameOrEmail(request.username(), request.email())
                 .ifPresent(existingUser -> {
                     if (existingUser.getUsername().equalsIgnoreCase(request.username())) {
                         throw new IllegalArgumentException("Username is already taken!");
@@ -31,13 +30,13 @@ public class UserRegistrationService {
                     }
                 });
 
-        // 2. HASH THE PASSWORD! (Crucial Security Step)
+        // 2. Hash password
         String hashedPassword = passwordEncoder.encode(request.password());
 
-        // 3. Create the new User entity
-        UserLoginEntity newUserEntity = new UserLoginEntity(request.username(), hashedPassword, request.email());
+        // 3. Create Domain Entity (enforces domain invariants)
+        User newUser = User.register(request.username(), request.email(), hashedPassword);
 
-        // 4. Save
-        userLoginRepository.save(newUserEntity);
+        // 4. Save via outbound port
+        return authRepositoryPort.save(newUser);
     }
 }

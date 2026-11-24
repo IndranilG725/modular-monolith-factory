@@ -9,10 +9,10 @@ import com.company.shared.exceptions.MyCustomException;
 
 @Repository
 public class M1RepositoryAdapter implements M1RepositoryPort {
-    private final SprinDataM1Repository sprinDataM1Repository;
+    private final SpringDataM1Repository sprinDataM1Repository;
     private final M1Mapper m1Mapper;
 
-    public M1RepositoryAdapter(SprinDataM1Repository sprinDataM1Repository, M1Mapper m1Mapper) {
+    public M1RepositoryAdapter(SpringDataM1Repository sprinDataM1Repository, M1Mapper m1Mapper) {
         this.sprinDataM1Repository = sprinDataM1Repository;
         this.m1Mapper = m1Mapper;
     }

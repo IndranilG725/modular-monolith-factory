@@ -27,7 +27,7 @@ public class M1Controller {
     @RateLimited(capacity = 5, refillTokens = 5, refillDuration = 1, unit = TimeUnit.MINUTES)
     @GetMapping("/{id}")
     ResponseEntity<M1DTO> m1Fn(@PathVariable Long id) {
-        return new ResponseEntity<>(m1Service.getM1(id), HttpStatus.OK);
+        return new ResponseEntity<>(m1Service.getM1byId(id), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

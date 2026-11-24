@@ -1,4 +1,4 @@
-package com.company.auth.service;
+package com.company.auth.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,15 +16,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.company.auth.entity.UserLoginEntity;
-import com.company.auth.repository.UserLoginRepository;
+import com.company.auth.domain.model.Role;
+import com.company.auth.domain.model.User;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CustomUserDetailsService Unit Tests")
 class CustomUserDetailsServiceTest {
+    @Mock
+    private User user;
 
     @Mock
-    private UserLoginRepository userLoginRepository;
+    private AuthRepositoryPort authRepositoryPort;
 
     @InjectMocks
     private CustomUserDetailsService customUserDetailsService;
@@ -35,9 +37,9 @@ class CustomUserDetailsServiceTest {
         // Arrange
         String username = "john_doe";
         String encodedPassword = "$2a$10$7EqJtq98hPqEX7fNZaFWoOhiMkWtZ1yXnO";
-        UserLoginEntity userEntity = new UserLoginEntity(username, encodedPassword, "john@example.com");
+        User user = new User(1234L, username, encodedPassword, "john@example.com", Role.ROLE_USER);
 
-        when(userLoginRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(authRepositoryPort.findByUsername(username)).thenReturn(Optional.of(user));
 
         // Act
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
@@ -52,7 +54,7 @@ class CustomUserDetailsServiceTest {
         assertThat(userDetails.isAccountNonLocked()).isTrue();
         assertThat(userDetails.isCredentialsNonExpired()).isTrue();
 
-        verify(userLoginRepository).findByUsername(username);
+        verify(authRepositoryPort).findByUsername(username);
     }
 
     @Test
@@ -60,14 +62,13 @@ class CustomUserDetailsServiceTest {
     void loadUserByUsername_WhenUserDoesNotExist_ShouldThrowUsernameNotFoundException() {
         // Arrange
         String username = "nonexistent_user";
-        when(userLoginRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(authRepositoryPort.findByUsername(username)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(username))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("User not found with username: " + username);
 
-        verify(userLoginRepository).findByUsername(username);
+        verify(authRepositoryPort).findByUsername(username);
     }
 }
-

@@ -1,6 +1,10 @@
-package com.company.auth.controller;
+package com.company.auth.infrastructure.web;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -10,17 +14,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.company.auth.dto.request.LoginRequestDTO;
-import com.company.auth.dto.request.RegisterRequestDTO;
-import com.company.auth.dto.response.LoginResponseDTO;
-import com.company.auth.service.TokenService;
-import com.company.auth.service.UserRegistrationService;
+import com.company.auth.application.TokenService;
+import com.company.auth.application.UserRegistrationService;
+import com.company.auth.application.dto.request.GoogleLoginRequestDTO;
+import com.company.auth.application.dto.request.LoginRequestDTO;
+import com.company.auth.application.dto.request.RegisterRequestDTO;
+import com.company.auth.application.dto.response.LoginResponseDTO;
+import com.company.auth.infrastructure.persistence.UserLoginEntity;
+import com.company.auth.infrastructure.persistence.SpringDataUserLoginRepository;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -31,17 +43,26 @@ public class AuthController {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
     private final UserRegistrationService registrationService;
+    private final SpringDataUserLoginRepository userLoginRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.cookie.secure:false}")
     private boolean cookieSecure;
 
+    @Value("${GOOGLE_CLIENT_ID}")
+    private String googleClientId;
+
     public AuthController(
             TokenService tokenService,
             AuthenticationManager authenticationManager,
-            UserRegistrationService registrationService) {
+            UserRegistrationService registrationService,
+            SpringDataUserLoginRepository userLoginRepository,
+            PasswordEncoder passwordEncoder) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
         this.registrationService = registrationService;
+        this.userLoginRepository = userLoginRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -64,6 +85,48 @@ public class AuthController {
         String refreshToken = tokenService.generateRefreshToken(username);
 
         // 3. Set refresh token in HttpOnly cookie
+        ResponseCookie cookie = createRefreshTokenCookie(refreshToken);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new LoginResponseDTO(accessToken));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<LoginResponseDTO> googleLogin(@RequestBody GoogleLoginRequestDTO request) {
+        // 1. Verify Google ID Token
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                new NetHttpTransport(),
+                GsonFactory.getDefaultInstance())
+                .setAudience(Collections.singletonList(googleClientId))
+                .build();
+
+        GoogleIdToken idToken = null;
+        try {
+            idToken = verifier.verify(request.idToken());
+        } catch (GeneralSecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (idToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        GoogleIdToken.Payload payload = idToken.getPayload();
+        String email = payload.getEmail();
+        String username = email; // Or extract name / custom username logic
+
+        // 2. Find or register user in UserLoginRepository
+        UserLoginEntity user = userLoginRepository.findByEmail(email)
+                .orElseGet(() -> userLoginRepository.save(
+                        new UserLoginEntity(username, passwordEncoder.encode(UUID.randomUUID().toString()), email)));
+
+        // 3. Generate app's own JWT tokens & HttpOnly refresh cookie
+        String accessToken = tokenService.generateAccessToken(user.getUsername());
+        String refreshToken = tokenService.generateRefreshToken(user.getUsername());
         ResponseCookie cookie = createRefreshTokenCookie(refreshToken);
 
         return ResponseEntity.ok()

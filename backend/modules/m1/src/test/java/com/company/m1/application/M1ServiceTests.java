@@ -37,7 +37,7 @@ public class M1ServiceTests {
         when(m1RepositoryPort.findById(id)).thenThrow(new MyCustomException("M1 not found"));
 
         // Act & Assert
-        assertThatThrownBy(() -> m1Service.getM1(id))
+        assertThatThrownBy(() -> m1Service.getM1byId(id))
                 .isInstanceOf(MyCustomException.class)
                 .hasMessage("M1 not found");
     }

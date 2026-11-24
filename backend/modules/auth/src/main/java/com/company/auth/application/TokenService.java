@@ -1,4 +1,4 @@
-package com.company.auth.service;
+package com.company.auth.application;
 
 import java.time.Duration;
 import java.time.Instant;

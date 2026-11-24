@@ -1,4 +1,4 @@
-package com.company.auth.service;
+package com.company.auth.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,16 +16,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.company.auth.dto.request.RegisterRequestDTO;
-import com.company.auth.entity.UserLoginEntity;
-import com.company.auth.repository.UserLoginRepository;
+import com.company.auth.application.dto.request.RegisterRequestDTO;
+import com.company.auth.infrastructure.persistence.UserLoginEntity;
+import com.company.auth.infrastructure.persistence.SpringDataUserLoginRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserRegistrationService Unit Tests")
 class UserRegistrationServiceTest {
 
     @Mock
-    private UserLoginRepository userLoginRepository;
+    private SpringDataUserLoginRepository userLoginRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -99,4 +99,3 @@ class UserRegistrationServiceTest {
         verify(userLoginRepository, never()).save(any());
     }
 }
-

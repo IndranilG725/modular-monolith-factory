@@ -1,4 +1,4 @@
-package com.company.auth.config;
+package com.company.auth.infrastructure.config;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;

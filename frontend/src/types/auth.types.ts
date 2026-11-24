@@ -13,6 +13,10 @@ export interface LoginResponse {
   accessToken: string
 }
 
+export interface GoogleLoginRequest {
+  idToken: string
+}
+
 export interface DecodedToken {
   sub?: string
   iss?: string
@@ -40,6 +44,7 @@ export interface AuthContextType {
   isAuthenticated: boolean
   isLoading: boolean
   login: (credentials: LoginRequest) => Promise<void>
+  loginWithGoogle: (idToken: string) => Promise<void>
   register: (data: RegisterRequest) => Promise<void>
   logout: () => Promise<void>
 }
